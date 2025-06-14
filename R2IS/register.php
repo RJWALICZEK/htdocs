@@ -1,50 +1,66 @@
 <?php
-$message = "";
-$alertClass = "alert-danger";
+session_start();
+require_once 'db.php'; // podłącz bazę, $conn
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $login = trim($_POST['login'] ?? '');
-    $haslo = $_POST['haslo'] ?? '';
-    $haslo2 = $_POST['haslo2'] ?? '';
+    $login = trim($_POST['login']);
+    $haslo = $_POST['haslo'];
+    $haslo2 = $_POST['haslo2'];
     $email = trim($_POST['email'] ?? '');
+    $rola = '0'; // standardowy użytkownik
 
-    if (empty($login) || empty($haslo) || empty($haslo2) || empty($email)) {
-        $message = "Wszystkie pola są wymagane.";
-    } elseif ($haslo !== $haslo2) {
-        $message = "Hasła nie są identyczne.";
-    } else {
-        require_once "db.php";
-        $hasloHash = password_hash($haslo, PASSWORD_DEFAULT);
-
-        $stmt = $conn->prepare("INSERT INTO users (login, haslo, email) VALUES (?, ?, ?)");
-        $stmt->bind_param("sss", $login, $hasloHash, $email);
-
-        if ($stmt->execute()) {
-            $message = "Rejestracja zakończona sukcesem!";
-            $alertClass = "alert-success";
-        } else {
-            $message = "Błąd rejestracji: " . $stmt->error;
-        }
+    // Prosta walidacja
+    if (empty($login) || empty($haslo) || empty($haslo2)) {
+        echo '<p>Wszystkie pola są wymagane!</p>';
+        header("refresh:3;url=index.php");
+        exit;
     }
+
+    if ($haslo !== $haslo2) {
+        echo '<p>Hasła nie są identyczne!</p>';
+        header("refresh:3;url=index.php");
+        exit;
+    }
+
+    // Hashowanie hasła (lepiej niż md5)
+    $haslo_hash = password_hash($haslo, PASSWORD_DEFAULT);
+
+    // Sprawdź, czy login już istnieje
+    $stmt = $conn->prepare("SELECT id_uzytkownik FROM uzytkownik WHERE nick = ?");
+    $stmt->bind_param("s", $login);
+    $stmt->execute();
+    $stmt->store_result();
+    if ($stmt->num_rows > 0) {
+        echo '<p>Login jest już zajęty!</p>';
+        header("refresh:3;url=index.php");
+        exit;
+    }
+    $stmt->close();
+
+    // Wstaw nowego użytkownika do bazy
+    $stmt = $conn->prepare("INSERT INTO uzytkownik (nick, imie, nazwisko, email, haslo, rola) VALUES (?, '', '', ?, ?, ?)");
+    $stmt->bind_param("sssi", $login, $email, $haslo_hash, $rola);
+    if ($stmt->execute()) {
+        // Pobierz id nowego użytkownika
+        $user_id = $conn->insert_id;
+
+        // Zaloguj użytkownika (session)
+        $_SESSION['user_id'] = $user_id;
+        $_SESSION['user_nick'] = $login;
+        $_SESSION['user_rola'] = $rola;
+
+        echo '<p>Rejestracja przebiegła pomyślnie. Za chwilę nastąpi przekierowanie...</p>';
+        // Przekierowanie po 3 sekundach na home.php
+        header("refresh:3;url=index.php");
+        exit;
+    } else {
+        echo '<p>Błąd podczas rejestracji. Za chwilę nastąpi przekierowanie...</p>';
+        header("refresh:3;url=index.php");
+        exit;
+    }
+} else {
+    // Jeśli ktoś wszedł bez POST
+    header("Location: index.php");
+    exit;
 }
 ?>
-
-<!-- HTML z komunikatem -->
-<!DOCTYPE html>
-<html lang="pl">
-<head>
-  <meta charset="UTF-8">
-  <title>Rejestracja</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-</head>
-<body>
-  <div class="container mt-5">
-
-    <?php if (!empty($message)): ?>
-      <div class="alert <?= $alertClass ?>"><?= htmlspecialchars($message) ?></div>
-    <?php endif; ?>
-
-    <a href="index.php" class="btn btn-secondary">Wróć</a>
-  </div>
-</body>
-</html>

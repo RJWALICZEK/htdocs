@@ -1,3 +1,7 @@
+<?php
+session_start();
+?>
+
 <!DOCTYPE html>
 <html lang="pl-PL">
 
@@ -8,7 +12,8 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-
+  <!-- css -->
+   <link rel="stylesheet" href="css/style.css">
   <!-- jquery dla app.js, ladowanie do main i promocje -->
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <script type="text/javascript" src="app.js" defer></script> <!-- defer czeka ze skryptem do czasu zaladowania calej strony -->
@@ -19,13 +24,33 @@
 </head>
 
 <body>
+<?php if (isset($_SESSION['error'])): ?>
+  <div class="alert alert-danger text-center">
+    <?= htmlspecialchars($_SESSION['error']) ?>
+  </div>
+  <?php unset($_SESSION['error']); ?>
+<?php endif; ?>
+
+<?php if (isset($_SESSION['success'])): ?>
+  <div class="alert alert-success text-center">
+    <?= htmlspecialchars($_SESSION['success']) ?>
+  </div>
+  <?php unset($_SESSION['success']); ?>
+<?php endif; ?>
 
 <!-- gorny pasek -->
   <div class="container-fluid header-top">
-      <div>
-        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#loginModal">Zaloguj</button>
-        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#registerModal">Rejestracja</button>            
-      </div>
+      <?php if (isset($_SESSION['user_nick'])): ?>
+  <div>
+    Witaj, <strong><?= htmlspecialchars($_SESSION['user_nick']) ?></strong>!
+    <a href="logout.php" class="btn btn-danger">Wyloguj</a>
+  </div>
+<?php else: ?>
+  <div>
+    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#loginModal">Zaloguj</button>
+    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#registerModal">Rejestracja</button>
+  </div>
+<?php endif; ?>
       <div>
   <img src="img/logo.png" alt="Logo" class="logo-link link" link="home.php">
 </div>
@@ -69,6 +94,7 @@
       <div class="row">
         <div class="col-md-3">
                 <div id="menu" class="btn-group-vertical m-1">
+                  
               <button type="button" link="home.php" class="link btn btn-primary">Strona główna</button>
               <button type="button" class="btn btn-primary link" link="products.php?kategoria=">Wszystkie produkty</button>
                 <div class="btn-group dropend">
