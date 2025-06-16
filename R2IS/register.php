@@ -24,7 +24,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $haslo_hash = md5($haslo);
 
 
-    // sprawdzanie czy login jest wolny
+    // sprawdzanie czy login jest git
     $stmt = $conn->prepare("SELECT id_uzytkownik FROM uzytkownik WHERE nick = ?");
     $stmt->bind_param("s", $login);
     $stmt->execute();
@@ -58,7 +58,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit;
     }
 } else {
-    // Jeśli ktoś wszedł bez POST
     header("Location: index.php");
     exit;
 }

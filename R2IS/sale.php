@@ -4,7 +4,6 @@ session_start();
 
 require_once "db.php";
 
-// Pobieramy produkty na promocji (promocja=1)
 $sql = "SELECT * FROM czesci WHERE promocja = 1";
 $stmt = $conn->prepare($sql);
 $stmt->execute();
@@ -12,7 +11,6 @@ $result = $stmt->get_result();
 
 $products = [];
 while ($row = $result->fetch_assoc()) {
-  // Obliczamy cenę po promocji 10%
   $row['cena_promocyjna'] = $row['cena'] * 0.9;
   $products[] = $row;
 }

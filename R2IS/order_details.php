@@ -12,11 +12,20 @@ if ($id_zam <= 0) {
     exit;
 }
 
-// Pobierz nagłówek zamówienia
 $stmt = $conn->prepare(
-    "SELECT z.id_zamowienia, z.id_uzytkownik, z.data, z.suma, u.nick, u.email
-     FROM zamowienia z
-     LEFT JOIN uzytkownik u ON z.id_uzytkownik = u.id_uzytkownik
+    "SELECT 
+    z.id_zamowienia,
+    z.id_uzytkownik,
+    z.data,
+    z.suma,
+    u.nick,
+    u.email,
+    a.ulica,
+    a.kod,
+    a.miejscowosc
+FROM zamowienia z
+JOIN uzytkownik u ON z.id_uzytkownik = u.id_uzytkownik
+JOIN adres a ON u.id_uzytkownik = a.id_uzytkownik
      WHERE z.id_zamowienia = ?"
 );
 $stmt->bind_param("i", $id_zam);
@@ -28,17 +37,7 @@ if ($res->num_rows === 0) {
 }
 $order = $res->fetch_assoc();
 $stmt->close();
-
-// Pobierz pozycje zamówienia
-$stmt2 = $conn->prepare(
-    "SELECT p.id_pozZamowienia, p.id_czesci, p.ilosc, p.cena_jednostkowa, c.nazwa
-     FROM pozycje_zamowienia p
-     LEFT JOIN czesci c ON p.id_czesci = c.id_czesci
-     WHERE p.id_zamowienia = ?"
-);
-$stmt2->bind_param("i", $id_zam);
-$stmt2->execute();
-$res2 = $stmt2->get_result();
+;
 ?>
 <!DOCTYPE html>
 <html lang="pl">
@@ -50,37 +49,14 @@ $res2 = $stmt2->get_result();
 </head>
 <body>
   <div class="container my-5">
-    <h1>Szczegóły zamówienia #<?= $order['id_zamowienia'] ?></h1>
+    <h1>Szczegóły #<?= $order['id_zamowienia'] ?></h1>
     <p><strong>Użytkownik:</strong> <?= htmlspecialchars($order['nick'] ?? '') ?> (ID <?= $order['id_uzytkownik'] ?>)</p>
     <p><strong>Email:</strong> <?= htmlspecialchars($order['email'] ?? '') ?></p>
     <p><strong>Data:</strong> <?= htmlspecialchars($order['data']) ?></p>
-    <p><strong>Suma:</strong> <?= number_format($order['suma'], 2, ',', ' ') ?> zł</p>
+    <p><strong>ulica:</strong> <?= htmlspecialchars($order['ulica']) ?></p>
+    <p><strong>kod:</strong> <?= htmlspecialchars($order['kod']) ?></p>
+    <p><strong>miejscowosc:</strong> <?= htmlspecialchars($order['miejscowosc']) ?></p>
 
-    <h3>Pozycje:</h3>
-    <div class="table-responsive">
-      <table class="table table-bordered table-striped">
-        <thead>
-          <tr>
-            <th>ID pozycji</th>
-            <th>Część</th>
-            <th>Ilość</th>
-            <th>Cena jednostkowa</th>
-            <th>Wartość</th>
-          </tr>
-        </thead>
-        <tbody>
-          <?php while($item = $res2->fetch_assoc()): ?>
-            <tr>
-              <td><?= $item['id_pozZamowienia'] ?></td>
-              <td><?= htmlspecialchars($item['nazwa'] ?? 'Nieznana') ?> (ID <?= $item['id_czesci'] ?>)</td>
-              <td><?= $item['ilosc'] ?></td>
-              <td><?= number_format($item['cena_jednostkowa'], 2, ',', ' ') ?> zł</td>
-              <td><?= number_format($item['ilosc'] * $item['cena_jednostkowa'], 2, ',', ' ') ?> zł</td>
-            </tr>
-          <?php endwhile; ?>
-        </tbody>
-      </table>
-    </div>
 
     <a href="admin_orders.php" class="btn btn-secondary mt-3">Powrót do listy zamówień</a>
   </div>

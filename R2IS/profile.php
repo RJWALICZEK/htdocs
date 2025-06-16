@@ -10,7 +10,6 @@ require_once 'db.php';
 $user_id = $_SESSION['user_id'];
 $message = '';
 
-// Obsługa zapisu zmian po POST
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $nick = trim($_POST['nick']);
     $email = trim($_POST['email']);
@@ -18,19 +17,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $kod = trim($_POST['kod']);
     $miejscowosc = trim($_POST['miejscowosc']);
 
-    // Prosta walidacja (możesz rozbudować)
     if ($nick === '' || $email === '' || $ulica === '' || $kod === '' || $miejscowosc === '') {
         $message = "Wszystkie pola są wymagane!";
     } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
         $message = "Niepoprawny format email.";
     } else {
-        // Aktualizacja danych użytkownika
         $sql = "UPDATE uzytkownik SET nick = ?, email = ? WHERE id_uzytkownik = ?";
         $stmt = $conn->prepare($sql);
         $stmt->bind_param("ssi", $nick, $email, $user_id);
         $stmt->execute();
 
-        // Aktualizacja adresu - jeśli adres istnieje, update, jeśli nie, insert
         $sqlCheck = "SELECT id_adres FROM adres WHERE id_uzytkownik = ?";
         $stmtCheck = $conn->prepare($sqlCheck);
         $stmtCheck->bind_param("i", $user_id);
@@ -38,7 +34,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $resultCheck = $stmtCheck->get_result();
 
         if ($resultCheck->num_rows > 0) {
-            // update istniejącego adresu
             $row = $resultCheck->fetch_assoc();
             $id_adres = $row['id_adres'];
 
@@ -47,7 +42,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $stmtAddr->bind_param("sssi", $ulica, $kod, $miejscowosc, $id_adres);
             $stmtAddr->execute();
         } else {
-            // wstaw nowy adres
             $sqlAddr = "INSERT INTO adres (id_uzytkownik, ulica, kod, miejscowosc) VALUES (?, ?, ?, ?)";
             $stmtAddr = $conn->prepare($sqlAddr);
             $stmtAddr->bind_param("isss", $user_id, $ulica, $kod, $miejscowosc);
@@ -60,7 +54,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-// Pobierz aktualne dane użytkownika
 $sql = "SELECT nick, email FROM uzytkownik WHERE id_uzytkownik = ?";
 $stmt = $conn->prepare($sql);
 $stmt->bind_param("i", $user_id);
@@ -68,7 +61,6 @@ $stmt->execute();
 $result = $stmt->get_result();
 $user = $result->fetch_assoc();
 
-// Pobierz adres (pierwszy)
 $sql_addr = "SELECT ulica, kod, miejscowosc FROM adres WHERE id_uzytkownik = ? LIMIT 1";
 $stmt_addr = $conn->prepare($sql_addr);
 $stmt_addr->bind_param("i", $user_id);

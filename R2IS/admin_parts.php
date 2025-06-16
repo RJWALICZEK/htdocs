@@ -6,7 +6,6 @@ if (!isset($_SESSION['rola']) || $_SESSION['rola'] != '1') {
     exit;
 }
 
-// Dozwolone pola do sortowania:
 $allowedSortFields = ['id_czesci', 'nazwa', 'cena', 'stan_magazynowy', 'id_kategoria', 'promocja'];
 $allowedSortOrders = ['asc', 'desc'];
 
@@ -19,7 +18,6 @@ if (!in_array($sort_order, $allowedSortOrders)) {
     $sort_order = 'asc';
 }
 
-// Pobierz listę części z dołączonymi nazwami kategorii i zniżką, jeśli istnieje
 $sql = "SELECT c.*, k.kategoria AS nazwa_kategorii, p.znizka_procent 
         FROM czesci c 
         LEFT JOIN kategoria k ON c.id_kategoria = k.id_kategoria
@@ -38,7 +36,6 @@ $result = $conn->query($sql);
 <body>
   <div class="container my-5">
     <h1>Zarządzanie częściami</h1>
-    <!-- Formularz sortowania -->
     <form method="GET" class="row g-2 mb-3">
       <div class="col-auto">
         <label for="sort_field" class="form-label">Sortuj po:</label>

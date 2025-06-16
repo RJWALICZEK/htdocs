@@ -6,18 +6,15 @@ if (!isset($_SESSION['rola']) || $_SESSION['rola'] != '1') {
     exit;
 }
 
-// Pobierz listę kategorii do selecta
 $cats = [];
 $res = $conn->query("SELECT id_kategoria, kategoria FROM kategoria");
 while ($r = $res->fetch_assoc()) {
     $cats[$r['id_kategoria']] = $r['kategoria'];
 }
 
-// Sprawdź, czy edytujemy istniejącą część (GET id)
 $id = isset($_GET['id']) ? intval($_GET['id']) : 0;
 $isEdit = $id > 0;
 
-// Zmienne dla formularza
 $nazwa = '';
 $opis = '';
 $cena = '';
@@ -28,7 +25,6 @@ $promocja = 0;
 $znizka_procent = 0;
 
 if ($isEdit) {
-    // Pobierz dane istniejącej części
     $stmt = $conn->prepare(
         "SELECT c.*, p.znizka_procent 
          FROM czesci c 
@@ -54,13 +50,12 @@ if ($isEdit) {
     $stmt->close();
 }
 
-// Obsługa POST: zapis zmian lub dodanie nowej
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // Pobierz dane z formularza
+ 
     $nazwa_f = trim($_POST['nazwa'] ?? '');
     $opis_f = trim($_POST['opis'] ?? '');
     $cena_f = floatval(str_replace(',', '.', $_POST['cena'] ?? 0));
-    $grafika_f = trim($_POST['grafika'] ?? ''); // tu tylko nazwa pliku. Możesz dodać upload.
+    $grafika_f = trim($_POST['grafika'] ?? ''); 
     $stan_f = intval($_POST['stan_magazynowy'] ?? 0);
     $kat_f = intval($_POST['id_kategoria'] ?? 0);
     $prom_f = isset($_POST['promocja']) && $_POST['promocja'] == '1' ? 1 : 0;
@@ -68,18 +63,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($znizka_f < 0) $znizka_f = 0;
     if ($znizka_f > 100) $znizka_f = 100;
 
-    // Walidacja minimalna
     $errors = [];
     if ($nazwa_f === '') $errors[] = "Nazwa nie może być pusta.";
     if ($opis_f === '') $errors[] = "Opis nie może być pusty.";
     if ($cena_f < 0) $errors[] = "Cena nie może być ujemna.";
     if ($stan_f < 0) $errors[] = "Stan magazynowy nie może być ujemny.";
     if (!isset($cats[$kat_f])) $errors[] = "Nieprawidłowa kategoria.";
-    // grafika_f: można sprawdzić, czy plik istnieje w katalogu, albo pozostawić dowolne.
 
     if (empty($errors)) {
         if ($isEdit) {
-            // Aktualizacja tabeli czesci
             $stmt = $conn->prepare(
                 "UPDATE czesci SET nazwa=?, opis=?, cena=?, grafika=?, stan_magazynowy=?, id_kategoria=?, promocja=? WHERE id_czesci=?"
             );
@@ -100,9 +92,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $stmt->close();
         }
         if ($ok) {
-            // Obsługa tabeli promocje: jeśli promocja=1 i zniżka>0 -> insert/update; jeśli promocja=0 -> usuń
             if ($prom_f) {
-                // Sprawdź istnienie
                 $stmt2 = $conn->prepare("SELECT id_promocja FROM promocje WHERE id_czesci = ?");
                 $stmt2->bind_param("i", $id);
                 $stmt2->execute();
@@ -120,7 +110,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 }
                 $stmt2->close();
             } else {
-                // usuń ewentualne promocje
+            
                 $stmtD = $conn->prepare("DELETE FROM promocje WHERE id_czesci = ?");
                 $stmtD->bind_param("i", $id);
                 $stmtD->execute();
@@ -135,7 +125,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 }
-// Wyświetlanie formularza:
+
 ?>
 <!DOCTYPE html>
 <html lang="pl">
@@ -206,7 +196,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-// Pokaż pole zniżki gdy promocja jest włączona
+
 document.getElementById('promocjaCheckbox').addEventListener('change', function() {
   document.getElementById('znizkaContainer').style.display = this.checked ? 'block' : 'none';
 });

@@ -2,7 +2,7 @@
 session_start();
 require_once "db.php";
 
-// Mapa kategorii (jak wcześniej)
+// Mapa kategorii 
 $kategorieMap = [
   'czesci_silnikowe' => ['id' => 2, 'nazwa' => 'Części silnikowe'],
   'uklad_napedowy'    => ['id' => 14, 'nazwa' => 'Układ napędowy'],
@@ -21,16 +21,13 @@ $kategorieMap = [
   'narzedzia'         => ['id'=>11,'nazwa'=>'Narzędzia']
 ];
 
-// Parametr GET do filtrowania kategorii
 $kategoria = $_GET['kategoria'] ?? '';
 
-// Parametr sortowania po cenie: 'asc' lub 'desc'
 $sort_price = $_GET['sort_price'] ?? '';
 if ($sort_price !== 'asc' && $sort_price !== 'desc') {
-    $sort_price = '';  // brak sortowania lub domyślne
+    $sort_price = '';  
 }
 
-// Przygotuj część ORDER BY
 $orderClause = '';
 if ($sort_price === 'asc') {
     $orderClause = " ORDER BY c.cena ASC";
@@ -38,7 +35,6 @@ if ($sort_price === 'asc') {
     $orderClause = " ORDER BY c.cena DESC";
 }
 
-// Budowa zapytania z filtrowaniem kategorii i ewentualnym sortowaniem
 if ($kategoria && isset($kategorieMap[$kategoria])) {
     $id_kategoria = $kategorieMap[$kategoria]['id'];
     $displayCategoryName = $kategorieMap[$kategoria]['nazwa'];
@@ -65,7 +61,6 @@ if ($kategoria && isset($kategorieMap[$kategoria])) {
 $stmt->execute();
 $result = $stmt->get_result();
 
-// Sprawdzenie zalogowania
 $isLoggedIn = isset($_SESSION['user_id']);
 ?>
 <!DOCTYPE html>
@@ -81,11 +76,9 @@ $isLoggedIn = isset($_SESSION['user_id']);
   <div class="container my-4">
     <h2>Produkty z kategorii: <?= htmlspecialchars($displayCategoryName) ?></h2>
 
-    <!-- Proste sortowanie po cenie -->
     <div class="mb-3">
       <span>Sortuj po cenie:</span>
       <?php
-      // Zachowaj parametr kategorii w linkach sortowania
       $baseUrl = basename($_SERVER['PHP_SELF']);
       $queryParams = [];
       if ($kategoria && isset($kategorieMap[$kategoria])) {
@@ -109,7 +102,6 @@ $isLoggedIn = isset($_SESSION['user_id']);
       Domyślne
     </a>
   <?php else: ?>
-    <!-- Link do usunięcia sortowania -->
     <a href="#"
        link="<?= $baseUrl . '?' . http_build_query($queryParams) ?>"
        class="link btn btn-sm btn-outline-secondary">
@@ -127,7 +119,6 @@ $isLoggedIn = isset($_SESSION['user_id']);
     <div class="row">
       <?php while ($row = $result->fetch_assoc()): ?>
         <?php
-          // Oblicz cenę promocyjną, jeśli promocja=1 i znizka_procent > 0
           $znizka = isset($row['znizka_procent']) ? (int)$row['znizka_procent'] : 0;
           $cena_promocyjna = null;
           if ((int)$row['promocja'] === 1 && $znizka > 0) {
@@ -143,7 +134,6 @@ $isLoggedIn = isset($_SESSION['user_id']);
             >
             <div class="card-body d-flex flex-column">
               <h5 class="card-title"><?= htmlspecialchars($row['nazwa']) ?></h5>
-              <!-- Opis w collapse -->
               <button class="btn btn-link p-0 mb-2 text-start" 
                       type="button" 
                       data-bs-toggle="collapse" 
@@ -174,16 +164,11 @@ $isLoggedIn = isset($_SESSION['user_id']);
               <div class="mt-auto">
                 <?php if ($isLoggedIn): ?>
                   <form method="POST" action="dodaj_do_koszyka.php" class="d-inline">
-                    <input type="hidden" name="id" value="<?= (int)$row['id_czesci'] ?>">
-                    <button type="submit" class="btn btn-success btn-sm">Dodaj do koszyka</button>
-                  </form>
-                  <form method="POST" action="buy_now.php" class="d-inline">
                     <input type="hidden" name="product_id" value="<?= (int)$row['id_czesci'] ?>">
-                    <button type="submit" class="btn btn-primary btn-sm">Kup teraz</button>
+                    <button type="submit" class="btn btn-primary btn-sm">Dodaj do koszyka</button>
                   </form>
                 <?php else: ?>
                   <button class="btn btn-success btn-sm" disabled onclick="alert('Musisz być zalogowany, aby dodać do koszyka.');">Dodaj do koszyka</button>
-                  <button class="btn btn-primary btn-sm" disabled onclick="alert('Musisz być zalogowany, aby kupić.');">Kup teraz</button>
                 <?php endif; ?>
               </div>
             </div>
@@ -193,7 +178,6 @@ $isLoggedIn = isset($_SESSION['user_id']);
     </div>
   </div>
 
-  <!-- Bootstrap JS -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

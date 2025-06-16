@@ -50,7 +50,7 @@ session_start();
         <a href="admin_panel.php" class="btn btn-warning">Panel administracyjny</a>
     <?php else: ?>
         <!-- Przycisk koszyka i profilu dla zwykłych użytkowników -->
-        <a href="cart.php" class="btn btn-success">Koszyk <i class="bi bi-cart3"></i></a>
+        <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#cartModal">Koszyk <i class="bi bi-cart3"></i></i></button>
         <button type="button" class="btn btn-info" data-bs-toggle="modal" data-bs-target="#profileModal">Profil <i class="bi bi-clipboard"></i></button>
     <?php endif; ?>
 
@@ -165,6 +165,7 @@ session_start();
   <?php include 'modal-login.php'; ?>
   <?php include 'modal-register.php'; ?>
   <?php include 'modal-profile.php'; ?>
+  <?php include 'modal-cart.php'; ?>
 </body>
 
 </html>

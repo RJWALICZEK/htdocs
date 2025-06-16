@@ -1,7 +1,6 @@
 <?php
 session_start();
 if (!isset($_SESSION['rola']) || $_SESSION['rola'] != '1') {
-    // Możesz przekierować np. na stronę główną:
     header('Location: index.php');
     exit;
 }
@@ -20,7 +19,6 @@ if (!isset($_SESSION['rola']) || $_SESSION['rola'] != '1') {
     <div class="list-group">
       <a href="admin_parts.php" class="list-group-item list-group-item-action">Zarządzaj częściami</a>
       <a href="admin_orders.php" class="list-group-item list-group-item-action">Przeglądaj zamówienia</a>
-      <!-- Możesz dodać np. zarządzanie użytkownikami, kategoriami itp. -->
     </div>
     <a href="index.php" class="btn btn-secondary mt-3">Powrót do strony głównej</a>
   </div>

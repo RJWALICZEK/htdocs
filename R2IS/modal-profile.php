@@ -1,8 +1,6 @@
 <?php
-session_start();
 
 if (!isset($_SESSION['user_id'])) {
-    // Nie zalogowany - można ewentualnie nie wyświetlać modalu lub przekierować
     return;
 }
 
@@ -12,7 +10,6 @@ $user_id = $_SESSION['user_id'];
 $message = $_SESSION['profile_message'] ?? '';
 unset($_SESSION['profile_message']);
 
-// Pobierz dane użytkownika
 $sql = "SELECT nick, email FROM uzytkownik WHERE id_uzytkownik = ?";
 $stmt = $conn->prepare($sql);
 $stmt->bind_param("i", $user_id);
@@ -20,7 +17,6 @@ $stmt->execute();
 $result = $stmt->get_result();
 $user = $result->fetch_assoc();
 
-// Pobierz adres
 $sql_addr = "SELECT ulica, kod, miejscowosc FROM adres WHERE id_uzytkownik = ? LIMIT 1";
 $stmt_addr = $conn->prepare($sql_addr);
 $stmt_addr->bind_param("i", $user_id);
@@ -29,7 +25,6 @@ $result_addr = $stmt_addr->get_result();
 $adres = $result_addr->fetch_assoc();
 ?>
 
-<!-- Modal Profilu -->
 <div class="modal fade" id="profileModal" tabindex="-1" aria-labelledby="profileModalLabel" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">

@@ -7,7 +7,7 @@ if (!isset($_SESSION['rola']) || $_SESSION['rola'] != '1') {
 }
 $id = isset($_GET['id']) ? intval($_GET['id']) : 0;
 if ($id > 0) {
-    // Najpierw usuń ewentualne promocje (zależność FK)
+    // Najpierw usuń zależność
     $stmt = $conn->prepare("DELETE FROM promocje WHERE id_czesci = ?");
     $stmt->bind_param("i", $id);
     $stmt->execute();

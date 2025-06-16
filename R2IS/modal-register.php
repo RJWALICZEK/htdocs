@@ -1,4 +1,3 @@
-<!-- modal-register.php -->
 <div class="modal fade" id="registerModal" tabindex="-1" aria-labelledby="registerModalLabel" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">
@@ -24,7 +23,6 @@
             <input type="password" class="form-control" id="haslo2" name="haslo2" placeholder="Powtórz hasło" required>
           </div>
 
-          <!-- Opcjonalnie np. email -->
           <div class="mb-3">
             <label for="email" class="form-label">E-mail:</label>
             <input type="email" class="form-control" id="email" name="email" placeholder="Podaj e-mail">
