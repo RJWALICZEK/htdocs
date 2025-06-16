@@ -69,3 +69,106 @@ footer {
   background-color: transparent; 
 }
 
+.editable:focus {
+  outline: 2px dashed #007bff;
+  background-color: #f0f8ff;
+}
+
+
+
+
+/*----------products----*/
+   .products-grid .product-card {
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      padding: 10px;
+      margin-bottom: 20px;
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+    }
+    .products-grid .product-wrapper {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+    }
+    .products-grid .product-card {
+      width: calc(25% - 20px);
+    }
+    .products-list .product-wrapper {
+      display: block;
+    }
+    .products-list .product-card {
+      display: flex;
+      gap: 15px;
+      border-bottom: 1px solid #ddd;
+      padding: 15px 0;
+      align-items: center;
+    }
+    .products-list .product-card img {
+      max-width: 120px;
+      border-radius: 4px;
+      flex-shrink: 0;
+    }
+    .product-card img {
+      max-width: 100%;
+      border-radius: 4px;
+      object-fit: cover;
+    }
+    .product-details {
+      flex-grow: 1;
+    }
+    .btn-buy, .btn-cart {
+      margin-top: 10px;
+    }
+    .btn-buy {
+      background-color: #0d6efd;
+      color: #fff;
+      border: none;
+      padding: 6px 12px;
+      border-radius: 4px;
+      font-weight: 500;
+      cursor: pointer;
+    }
+    .btn-buy:disabled {
+      background-color: #aaa;
+      cursor: not-allowed;
+    }
+    .btn-cart {
+      background-color: #198754;
+      color: #fff;
+      border: none;
+      padding: 6px 12px;
+      border-radius: 4px;
+      font-weight: 500;
+      cursor: pointer;
+      margin-left: 5px;
+    }
+    .btn-cart:disabled {
+      background-color: #aaa;
+      cursor: not-allowed;
+    }
+    .price-original {
+      text-decoration: line-through;
+      color: gray;
+      margin-right: 5px;
+    }
+    .price-promo {
+      color: red;
+      font-weight: bold;
+    }
+    /* Dla responsywności: w grid na mniejszych ekranach 2 kolumny */
+    @media (max-width: 992px) {
+      .products-grid .product-card {
+        width: calc(50% - 20px);
+      }
+    }
+    @media (max-width: 576px) {
+      .products-grid .product-card {
+        width: 100%;
+      }
+      .products-list .product-card {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+    }

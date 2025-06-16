@@ -1,5 +1,6 @@
 <?php
 session_start();
+
 ?>
 
 <!DOCTYPE html>
@@ -43,6 +44,16 @@ session_start();
       <?php if (isset($_SESSION['user_nick'])): ?>
   <div>
     Witaj, <strong><?= htmlspecialchars($_SESSION['user_nick']) ?></strong>!
+
+    <?php if (isset($_SESSION['rola']) && $_SESSION['rola'] == '1'): ?>
+        <!-- Przycisk do panelu administracyjnego -->
+        <a href="admin_panel.php" class="btn btn-warning">Panel administracyjny</a>
+    <?php else: ?>
+        <!-- Przycisk koszyka i profilu dla zwykłych użytkowników -->
+        <a href="cart.php" class="btn btn-success">Koszyk <i class="bi bi-cart3"></i></a>
+        <button type="button" class="btn btn-info" data-bs-toggle="modal" data-bs-target="#profileModal">Profil <i class="bi bi-clipboard"></i></button>
+    <?php endif; ?>
+
     <a href="logout.php" class="btn btn-danger">Wyloguj</a>
   </div>
 <?php else: ?>
@@ -153,6 +164,7 @@ session_start();
   
   <?php include 'modal-login.php'; ?>
   <?php include 'modal-register.php'; ?>
+  <?php include 'modal-profile.php'; ?>
 </body>
 
 </html>
